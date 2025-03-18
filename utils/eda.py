@@ -11,7 +11,7 @@ def general_informations(df):
     df.info()
 
 
-def bar_suddivisione_prodotti(df):
+def bar_product_subdivision(df):
     """
     Genera un grafico a barre che mostra la suddivisione tra Film e Serie TV nel files.
 
@@ -29,7 +29,7 @@ def bar_suddivisione_prodotti(df):
     plt.show()
 
 
-def bar_plot_tv_show(df):
+def bar_plot_series(df):
     """
     Genera un grafico a barre che mostra la classificazione delle Serie TV in base al target di età.
 
@@ -73,7 +73,7 @@ def bar_plot_movie(df):
     plt.show()
 
 
-def plot_generi_prodotti(df):
+def plot_product_genres(df):
     """
     Genera un grafico a barre che mostra la suddivisione di Film e Serie TV in base ai generi.
 
@@ -103,7 +103,7 @@ def plot_generi_prodotti(df):
     plt.show()
 
 
-def plot_generi_prodotti_unificati(df):
+def plot_unified_product_genres(df):
     """
     Genera un grafico a barre che mostra la suddivisione di Film e Serie TV in base ai generi.
 
