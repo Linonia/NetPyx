@@ -3,8 +3,8 @@ import pandas as pd
 import utils.eda as eda
 import utils.preprocessing as preprocessing
 
-#stampe = True
-stampe = False
+stampe = True
+#stampe = False
 
 # import del dataset nel programma
 dataframe = pd.read_csv("dataset/dataset_netflix.csv")
@@ -28,3 +28,7 @@ dataframe = preprocessing.unifica_generi(dataframe)
 # Mostra i generi aggiornati
 print("\nGeneri unificati:")
 print(dataframe[['title', 'listed_in']].head(10))
+
+if stampe:
+    eda.plot_generi_prodotti_unificati(dataframe)
+

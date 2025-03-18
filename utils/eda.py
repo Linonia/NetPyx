@@ -104,15 +104,27 @@ def plot_generi_prodotti(df):
 
 
 def plot_generi_prodotti_unificati(df):
-    print("\nStampa della suddivisione dei generi eseguita.\n")
-    genere_totale = df['listed_in'].str.split(', ', expand=True).stack().value_counts()
-    genere_totale = genere_totale.reset_index()
-    genere_totale.columns = ['Genere', 'Count']
+    """
+    Genera un grafico a barre che mostra la suddivisione di Film e Serie TV in base ai generi.
 
+    :param df: df di Pandas contenente il files da analizzare.
+    :return: None
+    """
+    print("\nStampa della distribuzione dei Generi.\n")
+
+    # Conta le occorrenze di ogni genere
+    genere = df['listed_in'].str.split(', ', expand=True).stack().value_counts()
+
+    # Converti in DataFrame
+    genere_df = genere.reset_index()
+    genere_df.columns = ['Genere', 'Count']
+
+    # Plot con Seaborn (senza warning)
     plt.figure(figsize=(12, 7))
-    plt.subplots_adjust(left=0.3)
-    seaborn.barplot(x='Count', y='Genere', data=genere_totale, palette='coolwarm')
-    plt.title('Distribuzione dei Generi')
+    seaborn.barplot(y='Genere', x='Count', hue='Genere', data=genere_df, palette='Reds_r', legend=False)
+
+    plt.title('Generi più presenti:')
     plt.xlabel('Quantità')
     plt.ylabel('Generi')
+
     plt.show()
