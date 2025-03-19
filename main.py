@@ -2,9 +2,11 @@ import pandas as pd
 
 import utils.eda as eda
 import utils.preprocessing as preprocessing
+import utils.addestramento_non_supervisionato as add_non_sup
 
-stampe = True
-#stampe = False
+
+#stampe = True
+stampe = False
 
 # import del dataset nel programma
 dataframe = pd.read_csv("dataset/netflix_titles_corrected.csv")
@@ -86,3 +88,21 @@ dataframe.info()
 dataframe.to_csv("fine_preprocesso.csv", index=False)
 
 
+# Addestramento non supervisionato Word2Vec
+# add_non_sup.setup_nltk()
+model = add_non_sup.train_word2vec(dataframe, vector_size=100)
+#model = add_non_sup.load_pretrained_word2vec()
+#model = add_non_sup.fine_tune_word2vec(model, dataframe)
+
+
+add_non_sup.get_similar_words(model, ["horror", "paranormal"])
+
+print("\n\n")
+
+# interrogazione modello
+suggestions = add_non_sup.get_similar_movies(dataframe, model, ["horror", "paranormal"])
+
+
+print("\n\nProva suggerimenti:\n")
+print(suggestions.columns)
+print(suggestions[['Titolo', 'Generi']].head(10))
