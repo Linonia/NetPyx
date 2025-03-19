@@ -144,7 +144,7 @@ def find_null_values(dataframe: pd.DataFrame):
     :param dataframe: DataFrame di Pandas contenente il files da analizzare.
     :return: None
     """
-    print(f"\nQuantità di valori mancanti per colonna nel files:\n{dataframe.isnull().sum()}")
+    print(f"\n\nQuantità di valori mancanti per colonna nel dataset:\n{dataframe.isnull().sum()}")
 
 
 def manage_null_values(dataframe: pd.DataFrame):
@@ -203,7 +203,7 @@ def permutazione_generi_numerici(df):
     # Creare il modello Word2Vec
     modello = Word2Vec(sentences=generi_totali, vector_size=100, window=5, min_count=1, workers=4, sg=0)
     vocabolario = list(modello.wv.key_to_index.keys())
-    print(f"\nGeneri presenti nel modello di Word2Vec:\n{vocabolario}")
+    print(f"\nGeneri presenti nel modello di Word2Vec:\n{vocabolario}\n")
 
     # Creare i vettori dei generi
     def genera_vettore(generi):
