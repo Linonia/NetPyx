@@ -2,7 +2,6 @@ import pandas as pd
 
 import utils.eda as eda
 import utils.preprocessing as preprocessing
-import utils.addestramento_non_supervisionato as add_non_sup
 import utils.addestramento_word2vec_WordNet as w2v_wn
 import utils.addestramento_word2vec as w2v
 
