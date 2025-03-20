@@ -35,7 +35,7 @@ def preprocess_text(row):
     return words  # Restituiamo una lista di parole per Word2Vec
 
 
-def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs=45):
+def train_word2vec(df, vector_size=150, window=4, min_count=2, workers=4, epochs=30):
     """
     Addestra un modello Word2Vec sulle descrizioni dei film con parametri più restrittivi.
     """
@@ -73,7 +73,7 @@ def get_similar_movies(df, model, keywords, topn=10):
         for word in valid_keywords:
             try:
                 similar = model.wv.most_similar(word, topn=topn)
-                similar_words.extend([w for w, score in similar if score > 0.75])  # Soglia di similarità
+                similar_words.extend([w for w, score in similar if score > 0.73])  # Soglia di similarità
             except KeyError:
                 continue
 
