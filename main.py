@@ -3,6 +3,8 @@ import pandas as pd
 import utils.eda as eda
 import utils.preprocessing as preprocessing
 import utils.addestramento_non_supervisionato as add_non_sup
+import utils.addestramento_word2vec_WordNet as w2v_wn
+import utils.addestramento_word2vec as w2v
 
 
 #stampe = True
@@ -85,24 +87,28 @@ print(dataframe[["Generi", "Vettori_Generi"]].head(20))
 print(f"\n\n\nFine fase di preprocessing, righe e colonne presenti:\n{dataframe.shape}")
 dataframe.info()
 # Fine Preprocessing
-dataframe.to_csv("fine_preprocesso.csv", index=False)
+# dataframe.to_csv("fine_preprocesso.csv", index=False)
 
 
-# Addestramento non supervisionato Word2Vec
-# add_non_sup.setup_nltk()
-model = add_non_sup.train_word2vec(dataframe, vector_size=100)
-#model = add_non_sup.load_pretrained_word2vec()
-#model = add_non_sup.fine_tune_word2vec(model, dataframe)
+print("\n\n\n\nProva senza Wordnet")
 
+word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
 
-add_non_sup.get_similar_words(model, ["horror", "paranormal"])
+# Prova senza WordNet
+model = w2v.train_word2vec(dataframe)
+for words in word_searching:
+    print(f"\n\nRisultati per {words} senza WordNet:\n")
+    w2v.get_similar_words(model, words, topn=3)
+    suggestions = w2v.get_similar_movies(dataframe, model, words, topn=5)
+    print(suggestions[['Titolo', 'Generi']].head(5))
 
-print("\n\n")
+print("\n\n\n\nProva con Wordnet")
 
-# interrogazione modello
-suggestions = add_non_sup.get_similar_movies(dataframe, model, ["horror", "paranormal"])
+# Prova con WordNet
+model_wn = w2v_wn.train_word2vec(dataframe)
+for words in word_searching:
+    print(f"\n\nRisultati per {words} con WordNet:\n")
+    w2v_wn.get_similar_words(model_wn, words, topn=3)
+    suggestions = w2v_wn.get_similar_movies(dataframe, model_wn, words, topn=5)
+    print(suggestions[['Titolo', 'Generi']].head(5))
 
-
-print("\n\nProva suggerimenti:\n")
-print(suggestions.columns)
-print(suggestions[['Titolo', 'Generi']].head(10))
