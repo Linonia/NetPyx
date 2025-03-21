@@ -11,34 +11,10 @@ nltk.download('punkt', quiet=True)
 nltk.download('punkt_tab', quiet=True)
 nltk.download('stopwords', quiet=True)
 nltk.download('wordnet', quiet=True)
-nltk.download('averaged_perceptron_tagger_eng', quiet=True)
-
+nltk.download('averaged_perceptron_tagger', quiet=True)
 
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
-
-
-def get_wordnet_pos(word):
-    """Ottiene la parte del discorso per la lemmatizzazione con WordNet."""
-    tag = nltk.pos_tag([word])[0][1][0].upper()
-    tag_dict = {"J": wordnet.ADJ, "V": wordnet.VERB}  # Solo aggettivi e verbi
-    return tag_dict.get(tag, None)
-
-
-def expand_with_synonyms(word):
-    synonyms = []
-
-    for syn in wordnet.synsets(word):
-        for lemma in syn.lemmas():
-            if lemma.name().lower() != word and "_" not in lemma.name():  # Evita la parola stessa e termini composti
-                synonyms.append((lemma.name().replace("_", " "), lemma.count()))  # Salva il sinonimo e la sua frequenza
-
-    if synonyms:
-        best_synonym = max(synonyms, key=lambda x: x[1])[0]  # Prende il più frequente
-        return best_synonym
-
-    return word  # Se non trova sinonimi validi, restituisce la parola originale
-
 
 def preprocess_text(row):
     """
@@ -48,22 +24,15 @@ def preprocess_text(row):
     - Tokenizza con NLTK
     - Rimuove stopwords
     - Applica lemmatizzazione
-    - Espande con sinonimi di WordNet
     """
-    text = f"{row['Generi']} {row['Descrizione']}"
+    text = f"{row['Generi']} {row['Descrizione']} " * 2  # Aumentiamo il peso dei generi
     if not isinstance(text, str) or text.strip() == "":
         return []
     text = text.lower()
     text = re.sub(r'[^a-zA-Z\s]', '', text)  # Rimuove numeri e punteggiatura
     words = word_tokenize(text)  # Tokenizzazione
     words = [lemmatizer.lemmatize(word) for word in words if word not in stop_words and len(word) > 2]
-
-    expanded_words = set(words)
-    for word in words:
-        expanded_words.update(expand_with_synonyms(word))
-
-    return expanded_words  # Restituiamo una lista di parole per Word2Vec
-
+    return words  # Restituiamo una lista di parole per Word2Vec
 
 def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs=25):
     """
@@ -86,11 +55,9 @@ def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs
 
     return model
 
-
 def get_similar_movies(df, model, keywords, topn=10):
     """
     Restituisce i film con descrizioni più simili alle parole chiave fornite.
-    Ora i film che hanno un genere corrispondente alle parole chiave ricevono un bonus di similarità.
     """
     valid_keywords = [lemmatizer.lemmatize(word) for word in keywords if word in model.wv]
 
@@ -103,7 +70,7 @@ def get_similar_movies(df, model, keywords, topn=10):
         for word in valid_keywords:
             try:
                 similar = model.wv.most_similar(word, topn=topn)
-                similar_words.extend([w for w, score in similar if score > 0.73])  # Soglia di similarità
+                similar_words.extend([w for w, score in similar if score > 0.50])  # Soglia di similarità
             except KeyError:
                 continue
 
@@ -119,11 +86,9 @@ def get_similar_movies(df, model, keywords, topn=10):
 
         # BOOST: Aggiungiamo un bonus se il genere del film è tra le parole chiave
         def apply_genre_boost(row):
-            genres = [g.lower() for g in row['Generi']] if isinstance(row['Generi'], list)\
-                else row['Generi'].lower().split(', ')
-
+            genres = [g.lower() for g in row['Generi']] if isinstance(row['Generi'], list) else row['Generi'].lower().split(', ')
             if any(genre in valid_keywords for genre in genres):
-                return row['similarity'] * 1.15  # Aumentiamo del 30%
+                return row['similarity'] * 1.15  # Aumentiamo del 15%
             return row['similarity']
 
         df['similarity'] = df.apply(apply_genre_boost, axis=1)
@@ -132,8 +97,6 @@ def get_similar_movies(df, model, keywords, topn=10):
 
     except KeyError:
         return df.iloc[0:0]  # Restituisce un DataFrame vuoto con le stesse colonne
-
-
 
 def get_similar_words(model, words, topn=5):
     """

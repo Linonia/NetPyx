@@ -6,8 +6,8 @@ import utils.addestramento_word2vec_WordNet as w2v_wn
 import utils.addestramento_word2vec as w2v
 
 
-#stampe = True
-stampe = False
+stampe = True
+#stampe = False
 
 # import del dataset nel programma
 dataframe = pd.read_csv("dataset/netflix_titles_corrected.csv")
@@ -98,16 +98,19 @@ model = w2v.train_word2vec(dataframe)
 for words in word_searching:
     print(f"\n\nRisultati per {words} senza WordNet:\n")
     w2v.get_similar_words(model, words, topn=3)
-    suggestions = w2v.get_similar_movies(dataframe, model, words, topn=5)
-    print(suggestions[['Titolo', 'Generi']].head(5))
+    suggestions = w2v.get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+    print(suggestions[['Titolo', 'Generi', ['similarity']]].head(5))
 
-print("\n\n\n\nProva con Wordnet")
+if stampe:
+    w2v.plot_keyword_coherence(dataframe, model, word_searching)
 
-# Prova con WordNet
-model_wn = w2v_wn.train_word2vec(dataframe)
-for words in word_searching:
-    print(f"\n\nRisultati per {words} con WordNet:\n")
-    w2v_wn.get_similar_words(model_wn, words, topn=3)
-    suggestions = w2v_wn.get_similar_movies(dataframe, model_wn, words, topn=5)
-    print(suggestions[['Titolo', 'Generi']].head(5))
+#print("\n\n\n\nProva con Wordnet")
+#
+## Prova con WordNet
+#model_wn = w2v_wn.train_word2vec(dataframe)
+#for words in word_searching:
+#    print(f"\n\nRisultati per {words} con WordNet:\n")
+#    w2v_wn.get_similar_words(model_wn, words, topn=3)
+#    suggestions = w2v_wn.get_similar_movies(dataframe, model_wn, words, topn=5)
+#    print(suggestions[['Titolo', 'Generi']].head(5))
 
