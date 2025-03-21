@@ -65,7 +65,7 @@ def preprocess_text(row):
     return expanded_words  # Restituiamo una lista di parole per Word2Vec
 
 
-def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs=45):
+def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs=25):
     """
     Addestra un modello Word2Vec sulle descrizioni dei film con parametri più restrittivi.
     """
@@ -90,8 +90,8 @@ def train_word2vec(df, vector_size=150, window=5, min_count=2, workers=4, epochs
 def get_similar_movies(df, model, keywords, topn=10):
     """
     Restituisce i film con descrizioni più simili alle parole chiave fornite.
+    Ora i film che hanno un genere corrispondente alle parole chiave ricevono un bonus di similarità.
     """
-    # Lemmatizza le parole chiave e verifica la loro presenza nel vocabolario
     valid_keywords = [lemmatizer.lemmatize(word) for word in keywords if word in model.wv]
 
     if not valid_keywords:
@@ -103,24 +103,36 @@ def get_similar_movies(df, model, keywords, topn=10):
         for word in valid_keywords:
             try:
                 similar = model.wv.most_similar(word, topn=topn)
-                similar_words.extend([w for w, score in similar if score > 0.75])  # Soglia di similarità
+                similar_words.extend([w for w, score in similar if score > 0.73])  # Soglia di similarità
             except KeyError:
                 continue
 
         all_words = set(valid_keywords + similar_words)
 
-        # Funzione per calcolare la similarità tra la descrizione e le parole chiave
         def cosine_similarity(description):
-            words = description.lower().split()  # Tokenizzazione
+            words = description.lower().split()
             similarity_scores = [model.wv.similarity(w, k) for w in words for k in all_words if w in model.wv]
             return np.mean(similarity_scores) if similarity_scores else 0.01
 
-        # Applica la funzione e filtra per punteggio di similarità alto
+        # Calcola la similarità con Word2Vec
         df['similarity'] = df['Descrizione'].apply(cosine_similarity)
+
+        # BOOST: Aggiungiamo un bonus se il genere del film è tra le parole chiave
+        def apply_genre_boost(row):
+            genres = [g.lower() for g in row['Generi']] if isinstance(row['Generi'], list)\
+                else row['Generi'].lower().split(', ')
+
+            if any(genre in valid_keywords for genre in genres):
+                return row['similarity'] * 1.15  # Aumentiamo del 30%
+            return row['similarity']
+
+        df['similarity'] = df.apply(apply_genre_boost, axis=1)
+
         return df.sort_values(by='similarity', ascending=False).head(topn)
 
     except KeyError:
         return df.iloc[0:0]  # Restituisce un DataFrame vuoto con le stesse colonne
+
 
 
 def get_similar_words(model, words, topn=5):
