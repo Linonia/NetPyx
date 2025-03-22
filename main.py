@@ -4,10 +4,14 @@ import utils.eda as eda
 import utils.preprocessing as preprocessing
 import utils.addestramento_word2vec_WordNet as w2v_wn
 import utils.addestramento_word2vec as w2v
+import utils.addestramento_supervisionato as add_sup
+import random
+import numpy as np
+
+#stampe = True
+stampe = False
 
 
-stampe = True
-#stampe = False
 
 # import del dataset nel programma
 dataframe = pd.read_csv("dataset/netflix_titles_corrected.csv")
@@ -32,6 +36,9 @@ if stampe:
 
 # Fine EDA
 
+#
+
+#
 
 # Preprocessing
 
@@ -63,6 +70,9 @@ numero_esempi = 10
 print(f"\nPrime {numero_esempi} righe del dataset con i ratings mappati:")
 print(dataframe[['ID', 'Titolo', 'Descrizione', 'Categoria']].head(numero_esempi))
 
+# modifica ai valori dei tipi
+dataframe = preprocessing.permutazione_tipo(dataframe)
+
 if stampe:
     print("\n\n")
     eda.bar_plot_categories(dataframe)
@@ -77,6 +87,9 @@ preprocessing.find_null_values(dataframe)
 print("\n\nRimozione eventuali duplicati...\n")
 dataframe = preprocessing.remove_duplicates(dataframe)
 
+# dataframe per addestramento non supervisionato
+non_sup_dataframe = dataframe.copy()
+
 print("\n\nTrasformazione dei generi in vettori numerici per futuri addestramenti:")
 dataframe = preprocessing.permutazione_generi_numerici(dataframe)
 
@@ -85,32 +98,53 @@ print(dataframe[["Generi", "Vettori_Generi"]].head(20))
 
 print(f"\n\n\nFine fase di preprocessing, righe e colonne presenti:\n{dataframe.shape}")
 dataframe.info()
+
+
 # Fine Preprocessing
-# dataframe.to_csv("fine_preprocesso.csv", index=False)
 
-
-print("\n\n\n\nProva senza Wordnet")
-
-word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
-
-# Prova senza WordNet
-model = w2v.train_word2vec(dataframe)
-for words in word_searching:
-    print(f"\n\nRisultati per {words} senza WordNet:\n")
-    w2v.get_similar_words(model, words, topn=3)
-    suggestions = w2v.get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
-    print(suggestions[['Titolo', 'Generi', ['similarity']]].head(5))
-
-if stampe:
-    w2v.plot_keyword_coherence(dataframe, model, word_searching)
-
-#print("\n\n\n\nProva con Wordnet")
 #
-## Prova con WordNet
-#model_wn = w2v_wn.train_word2vec(dataframe)
-#for words in word_searching:
-#    print(f"\n\nRisultati per {words} con WordNet:\n")
-#    w2v_wn.get_similar_words(model_wn, words, topn=3)
-#    suggestions = w2v_wn.get_similar_movies(dataframe, model_wn, words, topn=5)
-#    print(suggestions[['Titolo', 'Generi']].head(5))
+
+#
+
+# Inizio Test Addestramento Supervisionato
+
+add_sup.simulate_testing_sup_train(dataframe, stampe=stampe)
+
+# Fine Test addestramento Supervisionato
+
+#
+
+#
+
+# Inizio Test Addestramento non Supervisionato
+
+no_sup_model = w2v.simulate_testing_non_sup_train(dataframe, stampe=stampe)
+
+# Fine Test Addestramento non Supervisionato
+
+#
+
+#
+
+# Inizio fase utente
+
+while True:
+    print("\nScegli un'opzione:")
+    print("1. Cercare film per parole chiave (Apprendimento non supervisionato)")
+    print("2. Cercare film per preferenze personali (Apprendimento supervisionato)")
+    print("3. Uscire")
+
+    scelta = input("Inserisci il numero dell'opzione desiderata: ").strip()
+
+    if scelta == "1":
+        w2v.search_movies_by_user_input(non_sup_dataframe, no_sup_model, stampe=True)
+    elif scelta == "2":
+        add_sup.user_testing_sup_train(dataframe)
+    elif scelta == "3":
+        print("Uscita dal programma...")
+        break
+    else:
+        print("Scelta non valida, riprova.")
+
+
 

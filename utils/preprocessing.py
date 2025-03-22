@@ -214,4 +214,14 @@ def permutazione_generi_numerici(df):
 
     return df
 
+def permutazione_tipo(dataframe):
+    """
+    Modifica i valori della colonna 'Tipo':
+    - 'Movie' → 'Film'
+    - 'TV Show' → 'Serie TV'
+    """
+    dataframe["Tipo"] = dataframe["Tipo"].replace({"Movie": "Film", "TV Show": "Serie TV"})
+    return dataframe
+
+
 

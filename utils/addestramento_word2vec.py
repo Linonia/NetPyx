@@ -118,7 +118,7 @@ def get_similar_movies(df, model, keywords, topn=10):
         return df.iloc[0:0]  # Restituisce un DataFrame vuoto
 
 
-def get_similar_movies_with_plot(df, model, keywords, topn=10, stampe=True):
+def get_similar_movies_with_plot(df, model, keywords, topn=10, stampe=False):
     """
     Restituisce i film con descrizioni più simili alle parole chiave e genera un grafico con i punteggi se richiesto.
     """
@@ -241,4 +241,65 @@ def plot_keyword_coherence(df, model, keywords_list):
     plt.ylim(0, 1)
     plt.xticks(rotation=20, ha="center", fontsize=10)
     plt.subplots_adjust(bottom=0.2)
+    plt.savefig("plots/apprendimento_non_supervisionato_plot.jpg")
     plt.show()
+
+
+def simulate_testing_non_sup_train(dataframe, stampe=False):
+    """
+    Simula il test dell'addestramento non supervisionato con Word2Vec.
+
+    Args:
+        dataframe (pd.DataFrame): Il dataset contenente i film e le descrizioni.
+        stampe (bool): Se True, genera stampe aggiuntive e grafici.
+    """
+    word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
+
+    # Addestramento del modello Word2Vec
+    model = train_word2vec(dataframe)
+
+    for words in word_searching:
+        print(f"\n\nRisultati per {words} senza WordNet:\n")
+
+        # Ottenere parole simili
+        get_similar_words(model, words, topn=3)
+
+        # Ottenere film simili basandosi sulla trama
+        suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+
+        # Stampare i risultati principali
+        print(suggestions[['Titolo', 'Generi', 'similarity']].head(5))
+
+    # Generare il grafico di coerenza delle parole chiave se richiesto
+    if stampe:
+        plot_keyword_coherence(dataframe, model, word_searching)
+
+    return model
+
+
+def search_movies_by_user_input(dataframe, model, stampe=True):
+    """
+    Permette all'utente di inserire parole chiave per cercare film simili nel dataset.
+
+    Args:
+        dataframe (pd.DataFrame): Il dataset contenente i film e le descrizioni.
+        model: Il modello Word2Vec già addestrato.
+        stampe (bool): Se True, genera stampe aggiuntive e grafici.
+    """
+    words = input("Inserisci parole chiave separate da una virgola: ").strip().split(',')
+    words = [word.strip().lower() for word in words]
+
+    print(f"\n\nRisultati per {words} senza WordNet:\n")
+
+    # Ottenere parole simili
+    get_similar_words(model, words, topn=3)
+
+    # Ottenere film simili basandosi sulla trama
+    suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+
+    # Stampare i risultati principali
+    print(suggestions[['Titolo', 'Generi', 'similarity']].head(5))
+
+    # Generare il grafico di coerenza delle parole chiave se richiesto
+    if stampe:
+        plot_keyword_coherence(dataframe, model, [words])
