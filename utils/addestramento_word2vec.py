@@ -2,11 +2,14 @@ import re
 import nltk
 import numpy as np
 import seaborn
+import pandas as pd
 from gensim.models import Word2Vec
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import matplotlib.pyplot as plt
+import shutil
+import textwrap
 
 # Inizializza NLTK
 nltk.download('punkt', quiet=True)
@@ -235,7 +238,7 @@ def get_similar_movies_with_plot(dataframe, model, keywords, topn=10, stampe=Fal
             plt.subplots_adjust(bottom=0.3)  # Aggiunge più spazio sotto per i titoli
             plt.show()
 
-        return dataframe_results[['Titolo', 'similarity', 'Generi', 'Descrizione']]
+        return dataframe_results[['Titolo', 'similarity', 'Generi', 'Descrizione', 'Tipo', 'Durata']]
 
     except KeyError:
         return dataframe.iloc[0:0]  # Restituisce un DataFrame vuoto in caso di errore
@@ -259,9 +262,12 @@ def get_similar_words(model, words, topn=5):
         if lemma_word in model.wv:
             # Ottiene le parole più simili con i relativi punteggi
             similar_words = model.wv.most_similar(lemma_word, topn=topn)
-            print(f"Parole simili a '{lemma_word}': {similar_words}")
+
+            print(f"\n🔍 Parole simili a '{lemma_word}':")
+            for i, (similar_word, score) in enumerate(similar_words, start=1):
+                print(f"   {i}. {similar_word} (similarità: {score:.2f})")
         else:
-            print(f"'{lemma_word}' non è nel vocabolario del modello.")  # Messaggio se la parola non è presente
+            print(f"\n❌ '{lemma_word}' non è nel vocabolario del modello.")  # Messaggio se la parola non è presente
 
 
 def avg_similarity_top3(dataframe, model, keywords):
@@ -390,7 +396,7 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
         suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
 
         # Stampiamo i risultati principali
-        print(suggestions[['Titolo', 'Generi', 'similarity']].head(5))
+        print_recommended_movies(suggestions.head(5))
 
     # Se richiesto, generiamo un grafico di coerenza delle parole chiave
     if stampe:
@@ -418,7 +424,7 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
     words = input("Inserisci parole chiave separate da una virgola: ").strip().split(',')
     words = [word.strip().lower() for word in words]
 
-    print(f"\n\nRisultati per {words} senza WordNet:\n")
+    print(f"\n\nRisultati per {words}:\n")
 
     # Stampiamo le parole più simili trovate dal modello
     get_similar_words(model, words, topn=3)
@@ -427,8 +433,53 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
     suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
 
     # Stampiamo i risultati principali
-    print(suggestions[['Titolo', 'Generi', 'similarity']].head(5))
+    print_recommended_movies(suggestions.head(5))
 
     # Se richiesto, generiamo un grafico di coerenza delle parole chiave inserite
     if stampe:
         plot_keyword_coherence(dataframe, model, [words])
+
+
+def print_recommended_movies(recommended_movies):
+    """
+    Stampa i film consigliati in un formato leggibile e strutturato.
+
+    :param recommended_movies: DataFrame contenente i film consigliati con le seguenti colonne:
+        - 'Titolo' (str): Nome del film o della serie TV.
+        - 'Tipo' (str, opzionale): Tipologia (es. "Film", "Serie TV").
+        - 'Durata' (str, opzionale): Durata del film o degli episodi.
+        - 'Generi' (str): Elenco dei generi del film.
+        - 'Descrizione' (str): Breve sinossi del contenuto.
+    """
+
+    terminal_width = shutil.get_terminal_size().columns  # Ottiene la larghezza attuale del terminale
+    wrap_width = max(100, terminal_width - 20)  # Evita righe troppo lunghe, garantendo almeno 80 caratteri
+
+    if recommended_movies.empty:
+        print("\n❌ Nessun film trovato con le parole chiave fornite.\n")
+        return
+
+    print("\n\n📌 Ecco i film consigliati per te:\n")
+    for i, (_, row) in enumerate(recommended_movies.iterrows(), start=1):
+        # Recupera la durata, se disponibile, altrimenti mostra "N/A"
+        durata = row["Durata"] if "Durata" in row and pd.notna(row["Durata"]) else "N/A"
+
+        # Stampa titolo, tipo e durata del contenuto
+        print(f"🎬 {i}. {row['Titolo']} ({row.get('Tipo', 'N/A')} - {durata})")
+
+        # Stampa i generi del contenuto
+        print(f"   📂 Generi: {row['Generi']}")
+
+        # Formatta la descrizione adattandola alla larghezza del terminale
+        prefix = "   📝 Descrizione: "
+        adjusted_width = wrap_width - len(prefix)
+
+        wrapped_description = textwrap.fill(
+            row["Descrizione"],
+            width=adjusted_width,
+            initial_indent=prefix,  # Mantiene "📝 Descrizione: " sulla stessa riga
+            subsequent_indent=" " * (len(prefix) + 1)  # Allinea il testo sotto la "D"
+        )
+
+        print(wrapped_description)
+        print("   ----------------------------------------")  # Separatore tra i risultati

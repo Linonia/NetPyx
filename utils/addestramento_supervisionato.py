@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 from sklearn.metrics.pairwise import cosine_similarity
+import shutil
+import textwrap
 
 
 def prepare_dataset(dataframe):
@@ -161,7 +163,7 @@ def train_model(X, user_ratings):
     return model
 
 
-def recommend_movies(model, X, dataframe, top_n=10):
+def recommend_movies(model, X, dataframe, top_n=5):
     """
     Genera raccomandazioni di film basate sul modello addestrato.
 
@@ -185,14 +187,35 @@ def recommend_movies(model, X, dataframe, top_n=10):
     # Seleziona i primi top_n film raccomandati
     recommended_movies = dataframe.iloc[recommended_indices[:top_n]]
 
+    # Ottiene la larghezza attuale del terminale e imposta un valore minimo di 80 caratteri
+    terminal_width = shutil.get_terminal_size().columns
+    wrap_width = max(100, terminal_width - 20)
+
     # Stampa i risultati
     print("\n\n📌 Ecco i film consigliati per te:\n")
     for i, (_, row) in enumerate(recommended_movies.iterrows(), start=1):
-        durata = row["Durata"] if pd.notna(row["Durata"]) else "N/A"  # Gestione di eventuali valori mancanti
-        print(f"🎬 {i}. {row['Titolo']} ({row['Tipo']} - {durata})")  # Titolo, tipo e durata
-        print(f"   📂 Generi: {row['Generi']}")  # Generi associati
-        print(f"   📝 Descrizione: {row['Descrizione']}")  # Stampa completa della descrizione
-        print("   ----------------------------------------")
+        # Recupera la durata, se disponibile, altrimenti mostra "N/A"
+        durata = row["Durata"] if pd.notna(row["Durata"]) else "N/A"
+
+        # Stampa titolo, tipo e durata del contenuto
+        print(f"🎬 {i}. {row['Titolo']} ({row.get('Tipo', 'N/A')} - {durata})")
+
+        # Stampa i generi del contenuto
+        print(f"   📂 Generi: {row['Generi']}")
+
+        # Formatta la descrizione adattandola alla larghezza del terminale
+        prefix = "   📝 Descrizione: "
+        adjusted_width = wrap_width - len(prefix)
+
+        wrapped_description = textwrap.fill(
+            row["Descrizione"],
+            width=adjusted_width,
+            initial_indent=prefix,  # Mantiene "📝 Descrizione: " sulla stessa riga
+            subsequent_indent=" " * (len(prefix) + 1) # Allinea il testo sotto la "D"
+        )
+
+        print(wrapped_description)
+        print("   ----------------------------------------")  # Separatore tra i risultati
 
     return recommended_movies
 
