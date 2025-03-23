@@ -137,9 +137,9 @@ while True:
     scelta = input("Inserisci il numero dell'opzione desiderata: ").strip()
 
     if scelta == "1":
-        w2v.search_movies_by_user_input(non_sup_dataframe, no_sup_model, stampe=True)
+        w2v.search_movies_by_user_input(non_sup_dataframe, no_sup_model, stampe=stampe)
     elif scelta == "2":
-        add_sup.user_testing_sup_train(dataframe)
+        add_sup.user_testing_sup_train(dataframe, stampe=stampe)
     elif scelta == "3":
         print("Uscita dal programma...")
         break

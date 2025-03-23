@@ -247,7 +247,7 @@ def evaluate_recommendations(X, user_ratings, recommended_indices, dataframe):
     plt.show()
 
 
-def user_testing_sup_train(dataframe):
+def user_testing_sup_train(dataframe, stampe=False):
     """
     Esegue la fase di testing supervisionato chiedendo direttamente all'utente le valutazioni.
 
@@ -279,11 +279,10 @@ def user_testing_sup_train(dataframe):
     # Generazione delle raccomandazioni basate sul modello addestrato
     recommended_movies = recommend_movies(model, X, sup_dataframe)
 
-    # Ottenimento degli indici dei film consigliati per la fase di valutazione
-    recommended_indices = recommended_movies.index.to_numpy()
-
-    # Valutazione delle raccomandazioni in base alla similarità con il profilo utente
-    evaluate_recommendations(X, user_ratings, recommended_indices, sup_dataframe)
+    # Se richiesto, valutiamo le raccomandazioni con un grafico
+    if stampe:
+        recommended_indices = recommended_movies.index.to_numpy()
+        evaluate_recommendations(X, user_ratings, recommended_indices, sup_dataframe)
 
 
 def simulate_testing_sup_train(dataframe, stampe=False):
