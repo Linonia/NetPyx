@@ -129,22 +129,28 @@ no_sup_model = w2v.simulate_testing_non_sup_train(dataframe, stampe=stampe)
 # Inizio fase utente
 
 while True:
-    print("\nScegli un'opzione:")
-    print("1. Cercare film per parole chiave (Apprendimento non supervisionato)")
-    print("2. Cercare film per preferenze personali (Apprendimento supervisionato)")
-    print("3. Uscire")
+    print("\n" + "=" * 50)
+    print("📌 MENU PRINCIPALE")
+    print("=" * 50)
+    print("1️⃣  🔍 Cercare film per parole chiave (Apprendimento NON supervisionato)")
+    print("2️⃣  🎭 Cercare film per preferenze personali (Apprendimento supervisionato)")
+    print("3️⃣  ❌ Uscire")
+    print("=" * 50)
 
-    scelta = input("Inserisci il numero dell'opzione desiderata: ").strip()
+    scelta = input("👉 Inserisci il numero dell'opzione desiderata: ").strip().lower()
 
     if scelta == "1":
+        print("\n🔄 Avvio ricerca per parole chiave...")
         w2v.search_movies_by_user_input(non_sup_dataframe, no_sup_model, stampe=stampe)
     elif scelta == "2":
+        print("\n🛠️ Avvio ricerca basata sulle preferenze personali...")
         add_sup.user_testing_sup_train(dataframe, stampe=stampe)
     elif scelta == "3":
-        print("Uscita dal programma...")
+        print("\n👋 Uscita dal programma... Grazie per aver usato il sistema di raccomandazione!")
         break
     else:
-        print("Scelta non valida, riprova.")
+        print("\n⚠️ Scelta non valida! Inserisci un numero tra 1 e 3.")
+
 
 
 

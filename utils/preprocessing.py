@@ -220,7 +220,7 @@ def find_null_values(dataframe: pd.DataFrame):
     :return:
     """
     # Calcola e stampa la quantità di valori nulli per colonna
-    print(f"\n\nQuantità di valori mancanti per colonna nel dataset:\n{dataframe.isnull().sum()}")
+    print(f"Quantità di valori mancanti per colonna nel dataset:\n{dataframe.isnull().sum()}")
 
 
 def manage_null_values(dataframe: pd.DataFrame):
@@ -291,7 +291,7 @@ def permutazione_generi_numerici(dataframe, vector_size=100, window=5, min_count
                        window=window, min_count=min_count, workers=workers, sg=sg)
 
     vocabolario = list(modello.wv.key_to_index.keys())
-    print(f"\nGeneri presenti nel modello di Word2Vec:\n{vocabolario}\n")
+    print(f"Generi presenti nel modello di Word2Vec:\n{vocabolario}\n")
 
     # Otteniamo la dimensione dei vettori
     vector_dim = modello.vector_size

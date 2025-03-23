@@ -192,7 +192,7 @@ def recommend_movies(model, X, dataframe, top_n=5):
     wrap_width = max(100, terminal_width - 20)
 
     # Stampa i risultati
-    print("\n\n📌 Ecco i film consigliati per te:\n")
+    print("📌 Ecco i film consigliati per te:\n")
     for i, (_, row) in enumerate(recommended_movies.iterrows(), start=1):
         # Recupera la durata, se disponibile, altrimenti mostra "N/A"
         durata = row["Durata"] if pd.notna(row["Durata"]) else "N/A"
@@ -323,18 +323,28 @@ def simulate_testing_sup_train(dataframe, stampe=False):
     """
 
     # Preparazione del dataset per l'addestramento (trasformazione generi e descrizioni)
+    print("\n[INFO] Preparazione del dataset per l'addestramento supervisionato...\n")
     X, sup_dataframe = prepare_dataset(dataframe)
 
     # Simulazione delle valutazioni dell'utente
+    print("\n[INFO] Simulazione della votazione utente in corso...\n")
     user_ratings = simulate_user_ratings(sup_dataframe, num_ratings=20)
+    print("[OK] Simulazione completata.\n")
 
     # Addestramento del modello supervisionato basato sulle valutazioni simulate
+    print("\n[INFO] Addestramento del modello supervisionato...\n")
     model = train_model(X, user_ratings)
+    print("[OK] Modello addestrato con successo.\n")
 
     # Generazione delle raccomandazioni basate sul modello addestrato
+    print("\n[INFO] Generazione raccomandazioni...\n")
     recommended_movies = recommend_movies(model, X, sup_dataframe)
+    print("[OK] Raccomandazioni completate.\n")
 
     # Se richiesto, valutiamo le raccomandazioni con un grafico
     if stampe:
+        print("\n[INFO] Valutazione della qualità delle raccomandazioni...\n")
         recommended_indices = recommended_movies.index.to_numpy()
         evaluate_recommendations(X, user_ratings, recommended_indices, sup_dataframe)
+        print("[OK] Valutazione completata.\n")
+

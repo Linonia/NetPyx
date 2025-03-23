@@ -379,29 +379,41 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
     :return: Modello Word2Vec addestrato.
     """
 
+    print("\n[INFO] Avvio della simulazione di addestramento non supervisionato...\n")
+
     # Liste di parole chiave per testare il modello
     word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
+    print(f"[INFO] Liste di parole chiave utilizzate per il test: {word_searching}\n")
 
     # Addestriamo il modello Word2Vec sui dati del dataset
+    print("[INFO] Addestramento del modello Word2Vec in corso...\n")
     model = train_word2vec(dataframe)
+    print("[OK] Modello Word2Vec addestrato con successo.\n")
 
     # Iteriamo su ogni lista di parole chiave per testare il modello
     for words in word_searching:
-        print(f"\n\nRisultati per {words} senza WordNet:\n")
+        print("\n=========================================")
+        print(f"[INFO] Avvio test con parole chiave: {words}")
+        print("=========================================\n")
 
         # Stampiamo le parole più simili nel modello
         get_similar_words(model, words, topn=3)
 
         # Recuperiamo i film con descrizioni più affini alle parole chiave
+        print("\n[INFO] Recupero dei film consigliati...\n")
         suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+        print("[OK] Film suggeriti con successo.\n")
 
         # Stampiamo i risultati principali
         print_recommended_movies(suggestions.head(5))
 
     # Se richiesto, generiamo un grafico di coerenza delle parole chiave
     if stampe:
+        print("\n[INFO] Generazione grafico di coerenza delle parole chiave...\n")
         plot_keyword_coherence(dataframe, model, word_searching)
+        print("[OK] Grafico generato con successo.\n")
 
+    print("\n[OK] Simulazione di addestramento non supervisionato completata.\n")
     return model
 
 
@@ -411,6 +423,7 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
 
     La funzione:
     - Richiede all'utente di inserire parole chiave separate da una virgola.
+    - Lemmatizza le parole chiave usando la lemmatizzazione già implementata.
     - Trova le parole più simili nel modello Word2Vec.
     - Recupera i film con descrizioni più affini alle parole chiave inserite.
     - Stampa i risultati e genera un grafico sulla coerenza delle raccomandazioni, se richiesto.
@@ -424,6 +437,12 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
     words = input("Inserisci parole chiave separate da una virgola: ").strip().split(',')
     words = [word.strip().lower() for word in words]
 
+    print("\n🔄 Lemmatizzazione delle parole chiave in corso...\n")
+
+    # Usa la lemmatizzazione già presente nel codice esistente
+    words = [lemmatizer.lemmatize(word) for word in words]
+
+    print(f"\n✅ Parole lemmatizzate: {words}\n")
     print(f"\n\nRisultati per {words}:\n")
 
     # Stampiamo le parole più simili trovate dal modello
