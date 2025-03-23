@@ -128,20 +128,20 @@ def build_genre_mapping(genres):
     return {genre: cluster_names[cluster] for cluster, genres in clusters.items() for genre in genres}
 
 
-def unify_genres(df):
+def unify_genres(dataframe):
     """
     Trasforma i generi del dataset raggruppandoli in categorie unificate.
 
-    :param df: DataFrame contenente la colonna 'listed_in' con i generi originali.
+    :param dataframe: DataFrame contenente la colonna 'listed_in' con i generi originali.
     :return: DataFrame con i generi aggiornati.
     """
     # Verifica la presenza della colonna 'listed_in'
-    if 'listed_in' not in df.columns:
+    if 'listed_in' not in dataframe.columns:
         raise ValueError("Il dataframe non contiene la colonna 'listed_in'")
 
     # Estrazione dei generi unici presenti nel dataset
     generi_unici = set()
-    df['listed_in'].dropna().str.split(', ').apply(generi_unici.update)
+    dataframe['listed_in'].dropna().str.split(', ').apply(generi_unici.update)
 
     # Creazione della mappatura generi originali → generi unificati
     genre_mapping = build_genre_mapping(list(generi_unici))
@@ -152,9 +152,9 @@ def unify_genres(df):
         return ', '.join(mapped_genres)
 
     # Applicazione della trasformazione alla colonna 'listed_in'
-    df['listed_in'] = df['listed_in'].apply(lambda x: map_new_genres(x) if pd.notna(x) else x)
+    dataframe['listed_in'] = dataframe['listed_in'].apply(lambda x: map_new_genres(x) if pd.notna(x) else x)
 
-    return df
+    return dataframe
 
 
 def rename_features(dataframe):
@@ -250,15 +250,16 @@ def remove_duplicates(dataframe: pd.DataFrame):
     :param dataframe: DataFrame di Pandas da modificare.
     :return: DataFrame senza duplicati.
     """
-    df_temp = dataframe.copy()
+    dataframe_temp = dataframe.copy()
 
     # Converti temporaneamente in stringa le colonne che contengono dati complessi
-    for col in df_temp.columns:
-        if df_temp[col].apply(lambda x: isinstance(x, (list, dict, set, pd.Series, pd.DataFrame))).any():
-            df_temp[col] = df_temp[col].astype(str)
+    for col in dataframe_temp.columns:
+        if dataframe_temp[col].apply(lambda x: isinstance(x, (list, dict, set, pd.Series, pd.DataFrame))).any():
+            dataframe_temp[col] = dataframe_temp[col].astype(str)
 
     # Trova gli ID delle righe duplicate (ignorando la colonna 'ID')
-    duplicati = df_temp[df_temp.duplicated(subset=[col for col in df_temp.columns if col != 'ID'], keep='first')]['ID']
+    duplicati = dataframe_temp[dataframe_temp.duplicated(subset=[col for col in dataframe_temp.columns if col != 'ID'],
+                                                         keep='first')]['ID']
 
     # Rimuove i duplicati dal DataFrame originale
     dataframe = dataframe[~dataframe['ID'].isin(duplicati)].copy()
@@ -266,11 +267,11 @@ def remove_duplicates(dataframe: pd.DataFrame):
     return dataframe
 
 
-def permutazione_generi_numerici(df, vector_size=100, window=5, min_count=1, workers=4, sg=0):
+def permutazione_generi_numerici(dataframe, vector_size=100, window=5, min_count=1, workers=4, sg=0):
     """
     Converte i generi dei Film e delle Serie TV in vettori numerici utilizzando Word2Vec.
 
-    :param df: DataFrame di Pandas contenente il dataset da modificare.
+    :param dataframe: DataFrame di Pandas contenente il dataset da modificare.
     :param vector_size: Dimensione dei vettori generati da Word2Vec.
     :param window: Dimensione della finestra di contesto per Word2Vec.
     :param min_count: Frequenza minima per includere una parola nel modello.
@@ -280,10 +281,10 @@ def permutazione_generi_numerici(df, vector_size=100, window=5, min_count=1, wor
     """
 
     # Convertire i generi in liste
-    df['Generi'] = df['Generi'].apply(lambda x: x.split(', ') if isinstance(x, str) else [])
+    dataframe['Generi'] = dataframe['Generi'].apply(lambda x: x.split(', ') if isinstance(x, str) else [])
 
     # Creare una lista complessiva di generi
-    generi_totali = df['Generi'].tolist()
+    generi_totali = dataframe['Generi'].tolist()
 
     # Addestrare il modello Word2Vec
     modello = Word2Vec(sentences=generi_totali, vector_size=vector_size,
@@ -301,17 +302,23 @@ def permutazione_generi_numerici(df, vector_size=100, window=5, min_count=1, wor
         return np.mean(vettori, axis=0) if vettori else np.zeros(vector_dim)
 
     # Applicare la funzione al DataFrame
-    df['Vettori_Generi'] = df['Generi'].apply(genera_vettore)
+    dataframe['Vettori_Generi'] = dataframe['Generi'].apply(genera_vettore)
 
-    return df
+    return dataframe
 
 
 def permutazione_tipo(dataframe):
     """
-    Modifica i valori della colonna 'Tipo':
+    Converte i valori della colonna 'Tipo' per uniformare la nomenclatura:
     - 'Movie' → 'Film'
     - 'TV Show' → 'Serie TV'
+
+    :param dataframe: DataFrame di Pandas contenente il dataset da modificare.
+    :return: DataFrame con la colonna 'Tipo' aggiornata.
     """
+
+    # Controlla se la colonna 'Tipo' esiste nel DataFrame prima di modificarla
     if "Tipo" in dataframe.columns:
         dataframe["Tipo"] = dataframe["Tipo"].replace({"Movie": "Film", "TV Show": "Serie TV"})
+
     return dataframe
