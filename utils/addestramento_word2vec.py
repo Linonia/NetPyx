@@ -472,7 +472,7 @@ def print_recommended_movies(recommended_movies):
     """
 
     terminal_width = shutil.get_terminal_size().columns  # Ottiene la larghezza attuale del terminale
-    wrap_width = max(100, terminal_width - 20)  # Evita righe troppo lunghe, garantendo almeno 80 caratteri
+    wrap_width = max(120, terminal_width - 20)  # Evita righe troppo lunghe, garantendo almeno 80 caratteri
 
     if recommended_movies.empty:
         print("\n❌ Nessun film trovato con le parole chiave fornite.\n")

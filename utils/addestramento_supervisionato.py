@@ -189,7 +189,7 @@ def recommend_movies(model, X, dataframe, top_n=5):
 
     # Ottiene la larghezza attuale del terminale e imposta un valore minimo di 80 caratteri
     terminal_width = shutil.get_terminal_size().columns
-    wrap_width = max(100, terminal_width - 20)
+    wrap_width = max(120, terminal_width - 20)
 
     # Stampa i risultati
     print("📌 Ecco i film consigliati per te:\n")
