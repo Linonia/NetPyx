@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import pandas as pd
 import random
@@ -280,11 +281,12 @@ def user_testing_sup_train(dataframe, stampe=False):
     - Addestra un modello supervisionato sulla base delle valutazioni raccolte.
     - Genera raccomandazioni e le valuta in base alla similarità con il profilo utente.
 
+    :param stampe: Booleano che determina se stampare o no il grafico delle similarità.
     :param dataframe: DataFrame contenente i film da analizzare.
     """
 
     # Generazione di un seed casuale per garantire ripetibilità nei test
-    seed = random.randint(0, 10000)
+    seed = time.time()   # random.randint(0, 10000)
     random.seed(seed)
     np.random.seed(seed)
 
