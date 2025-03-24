@@ -402,7 +402,7 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
         get_similar_words(model, words, topn=3)
 
         # Recuperiamo i film con descrizioni più affini alle parole chiave
-        print("\n[INFO] Recupero dei film consigliati...\n")
+        print("\n\n\n[INFO] Recupero dei film consigliati...\n")
         suggestions = get_similar_movies_with_plot(dataframe, model, words, index=index, topn=5, stampe=stampe)
         print("[OK] Film suggeriti con successo.\n")
 
@@ -480,7 +480,7 @@ def print_recommended_movies(recommended_movies):
         print("\n❌ Nessun film trovato con le parole chiave fornite.\n")
         return
 
-    print("\n\n📌 Ecco i film consigliati per te:\n")
+    print("📌 Ecco i film consigliati per te:\n")
     for i, (_, row) in enumerate(recommended_movies.iterrows(), start=1):
         # Recupera la durata, se disponibile, altrimenti mostra "N/A"
         durata = row["Durata"] if "Durata" in row and pd.notna(row["Durata"]) else "N/A"
@@ -504,3 +504,4 @@ def print_recommended_movies(recommended_movies):
 
         print(wrapped_description)
         print("   ----------------------------------------")  # Separatore tra i risultati
+    print("\n\n")
