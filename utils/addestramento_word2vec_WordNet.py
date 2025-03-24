@@ -2,7 +2,7 @@ import re
 import nltk
 import numpy as np
 from gensim.models import Word2Vec
-from nltk.corpus import stopwords, wordnet
+from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 

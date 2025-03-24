@@ -11,8 +11,8 @@ seaborn>=0.11.0
 # Natural Language Processing
 nltk>=3.6.0
 
-#Word2Vec
+# Word2Vec
 gensim>=4.0.0
 
-#Machine Learning
+# Machine Learning
 scikit-learn>=1.0.0

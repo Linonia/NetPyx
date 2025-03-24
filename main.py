@@ -1,156 +1,155 @@
 import pandas as pd
-
 import utils.eda as eda
 import utils.preprocessing as preprocessing
-import utils.addestramento_word2vec_WordNet as w2v_wn
 import utils.addestramento_word2vec as w2v
 import utils.addestramento_supervisionato as add_sup
-import random
-import numpy as np
 
-#stampe = True
+
+# Attivazione/disattivazione stampe dettagliate
 stampe = False
 
+# ==============================================================================
+# IMPORT DEL DATASET
+# ==============================================================================
 
+print("\n\n==================================================")
+print("              IMPORTAZIONE DEL DATASET             ")
+print("==================================================\n")
 
-# import del dataset nel programma
+print("[INFO] Importazione del dataset...\n")
 dataframe = pd.read_csv("dataset/netflix_titles_corrected.csv")
+print("[OK] Dataset importato.\n")
 
+# ==============================================================================
+# EDA - ANALISI ESPLORATIVA DEI DATI
+# ==============================================================================
 
-# EDA
+print("\n\n==================================================")
+print("        ANALISI ESPLORATIVA DEL DATASET (EDA)      ")
+print("==================================================\n")
 
-# stampa nel terminale le informazioni generali del dataset
+print("[INFO] Avvio analisi esplorativa del dataset...\n")
 eda.general_informations(dataframe)
 
-# stampa del grafico che mostra la differenza tra Film e Serie TV
 if stampe:
-    print("\n\n")
-    # stampa del grafico che mostra la distribuzione di film e serie nel dataset
+    print("\n[INFO] Generazione dei grafici di analisi esplorativa...\n")
     eda.bar_product_subdivision(dataframe)
-    # stampa del grafico che mostra la distribuzione di categoria età per serie
     eda.bar_plot_series(dataframe)
-    # stampa del grafico che mostra la distribuzione di categoria età per film
     eda.bar_plot_movie(dataframe)
-    # stampa del grafico che mostra la distribuzione di generi tra serie e film
     eda.plot_product_genres(dataframe)
+    print("[OK] Grafici EDA generati con successo.\n")
 
-# Fine EDA
+# ==============================================================================
+# PREPROCESSING
+# ==============================================================================
 
-#
+print("\n\n==================================================")
+print("                PREPROCESSING DATI                 ")
+print("==================================================\n")
 
-#
+print("[INFO] Avvio preprocessing del dataset...\n")
 
-# Preprocessing
-
-# preprocessing per permutare i generi
+# Unificazione generi
+print("[INFO] Unificazione dei generi in corso...\n")
 dataframe = preprocessing.unify_genres(dataframe)
+print("[OK] Generi unificati.\n")
 
-# Mostra i generi aggiornati
-numero_esempi = 10
-print(f"\n\nUnificazione dei generi eseguita. Stampa dei primi {numero_esempi} elementi del dataframe:")
-print(dataframe[['title', 'listed_in']].head(numero_esempi))
 if stampe:
-    print("\n")
+    print("[INFO] Generazione del grafico di unificazione dei generi...\n")
     eda.plot_unified_product_genres(dataframe)
+    print("[OK] Grafico generato con successo.\n")
 
-# rinomina delle features
-print("\n\nRinomina dellle features. dataset attuale:")
-dataframe.info()
+# Rinomina features
+print("\n[INFO] Rinomina delle colonne in corso...\n")
 dataframe = preprocessing.rename_features(dataframe)
-print("\n\nDataset con features rinominate:")
+print("[OK] Rinomina completata.\n")
 dataframe.info()
 
-# Mapping delle categorie
-all_ratings = dataframe['Categoria'].value_counts().index.to_list()
-print(f"\n\nRinomina delle categorie di eta' presenti nel dataset.\nValori attuali: {sorted(all_ratings)}")
-dataframe['Categoria'] = dataframe['Categoria'].apply(preprocessing.map_rating)
-all_ratings = dataframe['Categoria'].value_counts().index.to_list()
-print(f"\n\nValori presenti dopo la rinomina delle categorie di età: {sorted(all_ratings)}")
-numero_esempi = 10
-print(f"\nPrime {numero_esempi} righe del dataset con i ratings mappati:")
-print(dataframe[['ID', 'Titolo', 'Descrizione', 'Categoria']].head(numero_esempi))
-
-# modifica ai valori dei tipi
+# Modifica valori tipo
+print("\n[INFO] Mappatura dei valori di tipo del prodotto in corso...\n")
 dataframe = preprocessing.type_permutation(dataframe)
+print("[OK] Tipologia di prodotto mappata.\n")
+
+# Mapping categorie età
+print("\n[INFO] Mappatura categorie di età...\n")
+dataframe['Categoria'] = dataframe['Categoria'].apply(preprocessing.map_rating)
+print("[OK] Categorie di età mappate.\n")
 
 if stampe:
-    print("\n\n")
+    print("[INFO] Generazione del grafico di distribuzione delle categorie di età...\n")
     eda.bar_plot_categories(dataframe)
+    print("[OK] Grafico generato con successo.\n")
 
-# gestione valori nulli
+# Gestione valori nulli
+print("\n[INFO] Identificazione e gestione dei valori nulli...\n")
 preprocessing.find_null_values(dataframe)
-print("\nRiempimento valori...")
 dataframe = preprocessing.manage_null_values(dataframe)
 preprocessing.find_null_values(dataframe)
+print("[OK] Valori nulli gestiti correttamente.\n")
 
-# rimozione dei duplicati
-print("\n\nRimozione eventuali duplicati...\n")
+# Rimozione duplicati
+print("\n[INFO] Rimozione duplicati...\n")
 dataframe = preprocessing.remove_duplicates(dataframe)
+print("[OK] Duplicati rimossi.\n")
 
-# dataframe per addestramento non supervisionato
-non_sup_dataframe = dataframe.copy()
-
-print("\n\nTrasformazione dei generi in vettori numerici per futuri addestramenti:")
+# Permutazione generi in vettori numerici
+print("\n[INFO] Conversione generi in vettori numerici...\n")
 dataframe = preprocessing.create_genres_vector(dataframe)
+print("[OK] Conversione completata.\n")
 
-print("\nRisultato della permutazione:\n")
-print(dataframe[["Generi", "Vettori_Generi"]].head(20))
-
-print(f"\n\n\nFine fase di preprocessing, righe e colonne presenti:\n{dataframe.shape}")
+print("\n\n[OK] Preprocessing completato. Dataset finale:\n")
 dataframe.info()
 
+# Creazione copia dataset per addestramento non supervisionato
+non_sup_dataframe = dataframe.copy()
 
-# Fine Preprocessing
+# ==============================================================================
+# APPRENDIMENTO SUPERVISIONATO - TEST
+# ==============================================================================
 
-#
+print("\n\n==================================================")
+print("        TEST APPRENDIMENTO SUPERVISIONATO          ")
+print("==================================================\n")
 
-#
-
-# Inizio Test Addestramento Supervisionato
-
+print("[INFO] Avvio test apprendimento supervisionato...\n")
 add_sup.simulate_testing_sup_train(dataframe, stampe=stampe)
+print("[OK] Test completato.\n")
 
-# Fine Test addestramento Supervisionato
+# ==============================================================================
+# APPRENDIMENTO NON SUPERVISIONATO - TEST
+# ==============================================================================
 
-#
+print("\n\n==================================================")
+print("      TEST APPRENDIMENTO NON SUPERVISIONATO        ")
+print("==================================================\n")
 
-#
-
-# Inizio Test Addestramento non Supervisionato
-
+print("[INFO] Avvio test apprendimento non supervisionato...\n")
 no_sup_model = w2v.simulate_testing_non_sup_train(dataframe, stampe=stampe)
+print("[OK] Test completato.\n")
 
-# Fine Test Addestramento non Supervisionato
-
-#
-
-#
-
-# Inizio fase utente
+# ==============================================================================
+# INTERAZIONE UTENTE
+# ==============================================================================
 
 while True:
-    print("\n" + "=" * 50)
-    print("📌 MENU PRINCIPALE")
-    print("=" * 50)
-    print("1️⃣  🔍 Cercare film per parole chiave (Apprendimento NON supervisionato)")
-    print("2️⃣  🎭 Cercare film per preferenze personali (Apprendimento supervisionato)")
-    print("3️⃣  ❌ Uscire")
-    print("=" * 50)
+    print("\n\n==================================================")
+    print("                    MENU PRINCIPALE                ")
+    print("==================================================\n")
+    print("1 - Cercare film per parole chiave (Apprendimento non supervisionato)")
+    print("2 - Cercare film per preferenze personali (Apprendimento supervisionato)")
+    print("3 - Uscire")
+    print("==================================================\n")
 
-    scelta = input("👉 Inserisci il numero dell'opzione desiderata: ").strip().lower()
+    scelta = input("Inserire il numero dell'opzione desiderata: ").strip()
 
     if scelta == "1":
-        print("\n🔄 Avvio ricerca per parole chiave...")
+        print("\n[INFO] Avvio ricerca per parole chiave...")
         w2v.search_movies_by_user_input(non_sup_dataframe, no_sup_model, stampe=stampe)
     elif scelta == "2":
-        print("\n🛠️ Avvio ricerca basata sulle preferenze personali...")
+        print("\n[INFO] Avvio ricerca basata sulle preferenze personali...\n")
         add_sup.user_testing_sup_train(dataframe, stampe=stampe)
     elif scelta == "3":
-        print("\n👋 Uscita dal programma... Grazie per aver usato il sistema di raccomandazione!")
+        print("\n[INFO] Uscita dal programma...\n")
         break
     else:
-        print("\n⚠️ Scelta non valida! Inserisci un numero tra 1 e 3.")
-
-
-
-
+        print("\n[ERRORE] Scelta non valida. Inserire un numero tra 1 e 3.\n")
