@@ -17,7 +17,7 @@ print("              IMPORTAZIONE DEL DATASET             ")
 print("==================================================\n")
 
 print("[INFO] Importazione del dataset...\n")
-dataframe = pd.read_csv("dataset/netflix_titles_corrected.csv")
+dataframe = pd.read_csv("dataset/netflix_titles.csv")
 print("[OK] Dataset importato.\n")
 
 # ==============================================================================
