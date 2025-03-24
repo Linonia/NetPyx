@@ -169,7 +169,7 @@ def get_similar_movies(dataframe, model, keywords, topn=10):
         return dataframe.iloc[0:0]  # Restituisce un DataFrame vuoto in caso di errore
 
 
-def get_similar_movies_with_plot(dataframe, model, keywords, topn=10, stampe=False):
+def get_similar_movies_with_plot(dataframe, model, keywords, index, topn=10, stampe=False):
     """
     Trova i film con descrizioni più simili alle parole chiave e, se richiesto, genera un grafico con i punteggi.
 
@@ -179,6 +179,7 @@ def get_similar_movies_with_plot(dataframe, model, keywords, topn=10, stampe=Fal
     :param dataframe: DataFrame contenente i dati dei film.
     :param model: Modello Word2Vec addestrato sulle descrizioni dei film.
     :param keywords: Lista di parole chiave inserite dall'utente per trovare film correlati.
+    :param index: Indica l'indice dell'insieme di parole testato
     :param topn: Numero massimo di film da restituire ordinati per rilevanza.
     :param stampe: Se True, genera un grafico a barre con i punteggi di similarità.
     :return: DataFrame con i film più simili alle parole chiave, ordinati per similarità.
@@ -236,6 +237,7 @@ def get_similar_movies_with_plot(dataframe, model, keywords, topn=10, stampe=Fal
             plt.ylim(0, 1)
             plt.xticks(rotation=20, ha="center", fontsize=10)
             plt.subplots_adjust(bottom=0.3)  # Aggiunge più spazio sotto per i titoli
+            plt.savefig(f"plots/addestramento_non_supervisionato_plot_consigli_film_{index}.jpg")
             plt.show()
 
         return dataframe_results[['Titolo', 'similarity', 'Generi', 'Descrizione', 'Tipo', 'Durata']]
@@ -358,7 +360,7 @@ def plot_keyword_coherence(dataframe, model, keywords_list):
     plt.subplots_adjust(bottom=0.2)  # Aggiungiamo spazio per le etichette lunghe
 
     # Salviamo il grafico come immagine
-    plt.savefig("plots/apprendimento_non_supervisionato_plot.jpg")
+    plt.savefig("plots/apprendimento_non_supervisionato_plot_parole_cercate.jpg")
 
     # Mostriamo il grafico
     plt.show()
@@ -391,7 +393,7 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
     print("[OK] Modello Word2Vec addestrato con successo.\n")
 
     # Iteriamo su ogni lista di parole chiave per testare il modello
-    for words in word_searching:
+    for index, words in enumerate(word_searching):
         print("\n=========================================")
         print(f"[INFO] Avvio test con parole chiave: {words}")
         print("=========================================\n")
@@ -401,7 +403,7 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
 
         # Recuperiamo i film con descrizioni più affini alle parole chiave
         print("\n[INFO] Recupero dei film consigliati...\n")
-        suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+        suggestions = get_similar_movies_with_plot(dataframe, model, words, index=index, topn=5, stampe=stampe)
         print("[OK] Film suggeriti con successo.\n")
 
         # Stampiamo i risultati principali
@@ -449,7 +451,7 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
     get_similar_words(model, words, topn=3)
 
     # Recuperiamo i film con descrizioni più affini alle parole chiave inserite
-    suggestions = get_similar_movies_with_plot(dataframe, model, words, topn=5, stampe=stampe)
+    suggestions = get_similar_movies_with_plot(dataframe, model, words, index="", topn=5, stampe=stampe)
 
     # Stampiamo i risultati principali
     print_recommended_movies(suggestions.head(5))

@@ -71,7 +71,7 @@ print(f"\nPrime {numero_esempi} righe del dataset con i ratings mappati:")
 print(dataframe[['ID', 'Titolo', 'Descrizione', 'Categoria']].head(numero_esempi))
 
 # modifica ai valori dei tipi
-dataframe = preprocessing.permutazione_tipo(dataframe)
+dataframe = preprocessing.type_permutation(dataframe)
 
 if stampe:
     print("\n\n")
@@ -91,7 +91,7 @@ dataframe = preprocessing.remove_duplicates(dataframe)
 non_sup_dataframe = dataframe.copy()
 
 print("\n\nTrasformazione dei generi in vettori numerici per futuri addestramenti:")
-dataframe = preprocessing.permutazione_generi_numerici(dataframe)
+dataframe = preprocessing.create_genres_vector(dataframe)
 
 print("\nRisultato della permutazione:\n")
 print(dataframe[["Generi", "Vettori_Generi"]].head(20))
