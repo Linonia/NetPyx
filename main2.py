@@ -65,13 +65,15 @@ dataframe = preprocessing.rename_features(dataframe)
 print("[OK] Rinomina completata.\n")
 dataframe.info()
 
+# Modifica valori tipo
+print("\n[INFO] Mappatura dei valori di tipo del prodotto in corso...\n")
+dataframe = preprocessing.type_permutation(dataframe)
+print("[OK] Tipologia di prodotto mappata.\n")
+
 # Mapping categorie età
 print("\n[INFO] Mappatura categorie di età...\n")
 dataframe['Categoria'] = dataframe['Categoria'].apply(preprocessing.map_rating)
 print("[OK] Categorie di età mappate.\n")
-
-# Modifica valori tipo
-dataframe = preprocessing.type_permutation(dataframe)
 
 if stampe:
     print("[INFO] Generazione del grafico di distribuzione delle categorie di età...\n")
