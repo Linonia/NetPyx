@@ -267,7 +267,7 @@ def remove_duplicates(dataframe: pd.DataFrame):
     return dataframe
 
 
-def permutazione_generi_numerici(dataframe, vector_size=100, window=5, min_count=1, workers=4, sg=0):
+def create_genres_vector(dataframe, vector_size=100, window=5, min_count=1, workers=4, sg=0):
     """
     Converte i generi dei Film e delle Serie TV in vettori numerici utilizzando Word2Vec.
 
@@ -307,7 +307,7 @@ def permutazione_generi_numerici(dataframe, vector_size=100, window=5, min_count
     return dataframe
 
 
-def permutazione_tipo(dataframe):
+def type_permutation(dataframe):
     """
     Converte i valori della colonna 'Tipo' per uniformare la nomenclatura:
     - 'Movie' → 'Film'

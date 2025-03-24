@@ -71,7 +71,7 @@ dataframe['Categoria'] = dataframe['Categoria'].apply(preprocessing.map_rating)
 print("[OK] Categorie di età mappate.\n")
 
 # Modifica valori tipo
-dataframe = preprocessing.permutazione_tipo(dataframe)
+dataframe = preprocessing.type_permutation(dataframe)
 
 if stampe:
     print("[INFO] Generazione del grafico di distribuzione delle categorie di età...\n")
@@ -92,7 +92,7 @@ print("[OK] Duplicati rimossi.\n")
 
 # Permutazione generi in vettori numerici
 print("\n[INFO] Conversione generi in vettori numerici...\n")
-dataframe = preprocessing.permutazione_generi_numerici(dataframe)
+dataframe = preprocessing.create_genres_vector(dataframe)
 print("[OK] Conversione completata.\n")
 
 print("\n\n[OK] Preprocessing completato. Dataset finale:\n")
