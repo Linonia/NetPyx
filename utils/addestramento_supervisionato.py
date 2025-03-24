@@ -286,7 +286,7 @@ def user_testing_sup_train(dataframe, stampe=False):
     """
 
     # Generazione di un seed casuale per garantire ripetibilità nei test
-    seed = time.time()   # random.randint(0, 10000)
+    seed = int(time.time())   # random.randint(0, 10000)
     random.seed(seed)
     np.random.seed(seed)
 
