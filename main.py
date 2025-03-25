@@ -65,6 +65,12 @@ dataframe = preprocessing.rename_features(dataframe)
 print("[OK] Rinomina completata.\n")
 dataframe.info()
 
+# Eliminazione di features non utili al programma
+print("\n[INFO] Eliminazione delle features non utili per il programma...\n")
+dataframe = preprocessing.delete_features(dataframe)
+print("[OK] Eliminazione completata.\n")
+
+
 # Modifica valori tipo
 print("\n[INFO] Mappatura dei valori di tipo del prodotto in corso...\n")
 dataframe = preprocessing.type_permutation(dataframe)

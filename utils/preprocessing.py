@@ -186,6 +186,17 @@ def rename_features(dataframe):
     return dataframe
 
 
+def delete_features(dataframe):
+    """
+    Rimuove colonne non necessarie dal dataset.
+
+    :param dataframe: DataFrame contenente le informazioni sui contenuti.
+    :return: DataFrame senza le colonne 'Regista', 'Cast', 'Data_Aggiunta', 'Data_Uscita' e 'Nazione'.
+    """
+    dataframe = dataframe.drop(columns=['Regista', 'Cast', 'Data_Aggiunta', 'Data_Uscita', 'Nazione'])
+    return dataframe
+
+
 def map_rating(rating):
     """
     Mappa il rating in una categoria generica di età.
@@ -234,10 +245,6 @@ def manage_null_values(dataframe: pd.DataFrame):
 
     # Riempie i valori nulli con valori predefiniti
     dataframe['Categoria'] = dataframe['Categoria'].fillna('Unrated')
-    dataframe['Regista'] = dataframe['Regista'].fillna('Sconosciuto')
-    dataframe['Nazione'] = dataframe['Nazione'].fillna('Sconosciuto')
-    dataframe['Data_Aggiunta'] = dataframe['Data_Aggiunta'].fillna('Sconosciuto')
-    dataframe['Cast'] = dataframe['Cast'].fillna('Sconosciuto')
 
     return dataframe
 
