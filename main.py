@@ -65,11 +65,17 @@ dataframe = preprocessing.rename_features(dataframe)
 print("[OK] Rinomina completata.\n")
 dataframe.info()
 
+# Gestione valori nulli
+print("\n[INFO] Identificazione e gestione dei valori nulli...\n")
+preprocessing.find_null_values(dataframe)
+dataframe = preprocessing.manage_null_values(dataframe)
+preprocessing.find_null_values(dataframe)
+print("[OK] Valori nulli gestiti correttamente.\n")
+
 # Eliminazione di features non utili al programma
 print("\n[INFO] Eliminazione delle features non utili per il programma...\n")
 dataframe = preprocessing.delete_features(dataframe)
 print("[OK] Eliminazione completata.\n")
-
 
 # Modifica valori tipo
 print("\n[INFO] Mappatura dei valori di tipo del prodotto in corso...\n")
@@ -86,12 +92,6 @@ if stampe:
     eda.bar_plot_categories(dataframe)
     print("[OK] Grafico generato con successo.\n")
 
-# Gestione valori nulli
-print("\n[INFO] Identificazione e gestione dei valori nulli...\n")
-preprocessing.find_null_values(dataframe)
-dataframe = preprocessing.manage_null_values(dataframe)
-preprocessing.find_null_values(dataframe)
-print("[OK] Valori nulli gestiti correttamente.\n")
 
 # Rimozione duplicati
 print("\n[INFO] Rimozione duplicati...\n")

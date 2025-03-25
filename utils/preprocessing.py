@@ -245,6 +245,10 @@ def manage_null_values(dataframe: pd.DataFrame):
 
     # Riempie i valori nulli con valori predefiniti
     dataframe['Categoria'] = dataframe['Categoria'].fillna('Unrated')
+    dataframe['Regista'] = dataframe['Regista'].fillna('Sconosciuto')
+    dataframe['Nazione'] = dataframe['Nazione'].fillna('Sconosciuto')
+    dataframe['Data_Aggiunta'] = dataframe['Data_Aggiunta'].fillna('Sconosciuto')
+    dataframe['Cast'] = dataframe['Cast'].fillna('Sconosciuto')
 
     return dataframe
 
