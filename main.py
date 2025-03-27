@@ -72,6 +72,11 @@ dataframe = preprocessing.manage_null_values(dataframe)
 preprocessing.find_null_values(dataframe)
 print("[OK] Valori nulli gestiti correttamente.\n")
 
+# Rimozione duplicati
+print("\n[INFO] Rimozione duplicati...\n")
+dataframe = preprocessing.remove_duplicates(dataframe)
+print("[OK] Duplicati rimossi.\n")
+
 # Eliminazione di features non utili al programma
 print("\n[INFO] Eliminazione delle features non utili per il programma...\n")
 dataframe = preprocessing.delete_features(dataframe)
@@ -91,12 +96,6 @@ if stampe:
     print("[INFO] Generazione del grafico di distribuzione delle categorie di età...\n")
     eda.bar_plot_categories(dataframe)
     print("[OK] Grafico generato con successo.\n")
-
-
-# Rimozione duplicati
-print("\n[INFO] Rimozione duplicati...\n")
-dataframe = preprocessing.remove_duplicates(dataframe)
-print("[OK] Duplicati rimossi.\n")
 
 # Permutazione generi in vettori numerici
 print("\n[INFO] Conversione generi in vettori numerici...\n")

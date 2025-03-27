@@ -40,7 +40,7 @@ def prepare_dataset(dataframe):
     return X_final, dataframe
 
 
-def ask_user_ratings(dataframe, num_ratings=10):
+def ask_user_ratings(dataframe, num_ratings=20):
     """
     Chiede all'utente di valutare un numero specifico di film, raccogliendo sia valutazioni effettive che giudizi di ispirazione.
 
@@ -96,7 +96,7 @@ def ask_user_ratings(dataframe, num_ratings=10):
     return user_ratings
 
 
-def simulate_user_ratings(dataframe, num_ratings=10):
+def simulate_user_ratings(dataframe, num_ratings=20):
     """
     Simula le valutazioni dell'utente assegnando punteggi casuali ai film.
 
@@ -164,7 +164,7 @@ def train_model(X, user_ratings):
     return model
 
 
-def recommend_movies(model, X, dataframe, top_n=5):
+def recommend_movies(model, X, dataframe, user_ratings, top_n=5):
     """
     Genera raccomandazioni di film basate sul modello addestrato.
 
@@ -184,6 +184,12 @@ def recommend_movies(model, X, dataframe, top_n=5):
 
     # Ordina gli indici dei film in base ai voti previsti in ordine decrescente
     recommended_indices = np.argsort(predicted_ratings)[::-1]
+
+    # Ottiene gli indici dei film già visti (peso = 1)
+    watched_movie_indices = {idx for idx, (_, weight) in user_ratings.items() if weight == 1}
+
+    # Filtra gli indici per escludere i film già visti
+    recommended_indices = [idx for idx in recommended_indices if idx not in watched_movie_indices]
 
     # Seleziona i primi top_n film raccomandati
     recommended_movies = dataframe.iloc[recommended_indices[:top_n]]
@@ -330,7 +336,7 @@ def simulate_testing_sup_train(dataframe, stampe=False):
 
     # Simulazione delle valutazioni dell'utente
     print("\n[INFO] Simulazione della votazione utente in corso...\n")
-    user_ratings = simulate_user_ratings(sup_dataframe, num_ratings=20)
+    user_ratings = simulate_user_ratings(sup_dataframe)
     print("[OK] Simulazione completata.\n")
 
     # Addestramento del modello supervisionato basato sulle valutazioni simulate
@@ -340,7 +346,7 @@ def simulate_testing_sup_train(dataframe, stampe=False):
 
     # Generazione delle raccomandazioni basate sul modello addestrato
     print("\n[INFO] Generazione raccomandazioni...\n")
-    recommended_movies = recommend_movies(model, X, sup_dataframe)
+    recommended_movies = recommend_movies(model, X, sup_dataframe, user_ratings)
     print("[OK] Raccomandazioni completate.\n")
 
     # Se richiesto, valutiamo le raccomandazioni con un grafico
