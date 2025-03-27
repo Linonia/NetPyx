@@ -129,8 +129,8 @@ def simulate_user_ratings(dataframe, num_ratings=20):
     """
 
     # Imposta un seed per la riproducibilità dei risultati
-    random.seed(42)
-    np.random.seed(42)
+    random.seed(30)
+    np.random.seed(30)
 
     # Seleziona casualmente gli indici dei film da valutare
     sample_indices = random.sample(range(len(dataframe)), num_ratings)
