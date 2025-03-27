@@ -308,7 +308,7 @@ def user_testing_sup_train(dataframe, stampe=False):
     model = train_model(X, user_ratings)
 
     # Generazione delle raccomandazioni basate sul modello addestrato
-    recommended_movies = recommend_movies(model, X, sup_dataframe)
+    recommended_movies = recommend_movies(model, X, sup_dataframe, user_ratings)
 
     # Se richiesto, valutiamo le raccomandazioni con un grafico
     if stampe:
