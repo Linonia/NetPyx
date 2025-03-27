@@ -40,6 +40,10 @@ def prepare_dataset(dataframe):
     return X_final, dataframe
 
 
+import random
+import shutil
+import textwrap
+
 def ask_user_ratings(dataframe, num_ratings=20):
     """
     Chiede all'utente di valutare un numero specifico di film, raccogliendo sia valutazioni effettive che giudizi di ispirazione.
@@ -58,6 +62,10 @@ def ask_user_ratings(dataframe, num_ratings=20):
     available_indices = list(range(len(dataframe)))  # Lista di indici disponibili per la selezione
     random.shuffle(available_indices)  # Mescola gli indici per proporre film casualmente
 
+    # Ottiene la larghezza attuale del terminale e imposta un valore minimo di 120 caratteri
+    terminal_width = shutil.get_terminal_size().columns
+    wrap_width = max(120, terminal_width - 20)
+
     print("Valutazione dei film. Rispondi con un numero da 1 a 10, scrivi 'skip' per saltare o 'stop' per terminare.")
 
     while len(user_ratings) < num_ratings and available_indices:
@@ -66,34 +74,44 @@ def ask_user_ratings(dataframe, num_ratings=20):
 
         print(f"\nTitolo: {film['Titolo']}")
         print(f"Generi: {film['Generi']}")
-        print(f"Descrizione: {film['Descrizione']}")
+        # Formatta la descrizione per rispettare la larghezza massima
+        wrapped_description = textwrap.fill(film['Descrizione'], width=wrap_width)
+        print(f"Descrizione:\n{wrapped_description}")
 
-        visto = input("Hai visto questo film? (sì/no/skip/stop): ").strip().lower()
+        while True:
+            visto = input("Hai visto questo film? (sì/no/skip/stop): ").strip().lower()
 
-        if visto == "stop":
-            break  # L'utente interrompe il processo
+            if visto == "stop":
+                return None  # Termina immediatamente il processo
 
-        if visto == "skip":
-            continue  # Non conta la valutazione e passa al film successivo
+            if visto == "skip":
+                break  # Non conta la valutazione e passa al film successivo
 
-        if visto == "sì":
-            while True:
-                voto = input("Dai un voto da 1 a 10: ")
-                if voto.isdigit() and 1 <= int(voto) <= 10:
-                    user_ratings[idx] = (int(voto), 1.0)  # Peso pieno per film visti
-                    break
-                else:
-                    print("Inserisci un numero valido da 1 a 10.")
-        else:
-            while True:
-                voto = input("Quanto ti ispira, da 1 a 10?: ")
-                if voto.isdigit() and 1 <= int(voto) <= 10:
-                    user_ratings[idx] = (int(voto), 0.6)  # Peso ridotto per valutazioni di ispirazione
-                    break
-                else:
-                    print("Inserisci un numero valido da 1 a 10.")
+            if visto == "si":
+                while True:
+                    voto = input("Dai un voto da 1 a 10: ")
+                    if voto.isdigit() and 1 <= int(voto) <= 10:
+                        user_ratings[idx] = (int(voto), 1.0)  # Peso pieno per film visti
+                        break
+                    else:
+                        print("Inserisci un numero valido da 1 a 10.")
+                break  # Esce dal ciclo "visto"
+
+            elif visto == "no":
+                while True:
+                    voto = input("Quanto ti ispira, da 1 a 10?: ")
+                    if voto.isdigit() and 1 <= int(voto) <= 10:
+                        user_ratings[idx] = (int(voto), 0.6)  # Peso ridotto per valutazioni di ispirazione
+                        break
+                    else:
+                        print("Inserisci un numero valido da 1 a 10.")
+                break  # Esce dal ciclo "ispirazione"
+
+            else:
+                print("Risposta non valida, riprova.")  # Ripete la richiesta di input
 
     return user_ratings
+
 
 
 def simulate_user_ratings(dataframe, num_ratings=20):
@@ -172,6 +190,7 @@ def recommend_movies(model, X, dataframe, user_ratings, top_n=5):
     - Ordina i film in base al punteggio previsto, dal più alto al più basso.
     - Seleziona i top_n film con il punteggio più alto e li stampa con dettagli.
 
+    :param user_ratings: Film valutati dall'utente.
     :param model: Modello di regressione addestrato.
     :param X: Matrice delle feature dei film.
     :param dataframe: DataFrame contenente i dati dei film.
@@ -182,19 +201,25 @@ def recommend_movies(model, X, dataframe, user_ratings, top_n=5):
     # Predice i voti per tutti i film basandosi sulle feature fornite
     predicted_ratings = model.predict(X)
 
-    # Ordina gli indici dei film in base ai voti previsti in ordine decrescente
-    recommended_indices = np.argsort(predicted_ratings)[::-1]
+    # Ottiene gli indici dei film già visti (peso >= 0.9)
+    watched_movie_indices = {idx for idx, (_, weight) in user_ratings.items() if weight >= 0.9}
 
-    # Ottiene gli indici dei film già visti (peso = 1)
-    watched_movie_indices = {idx for idx, (_, weight) in user_ratings.items() if weight == 1}
+    # Crea un array di indici validi escludendo i film già visti
+    valid_indices = [idx for idx in dataframe.index if idx not in watched_movie_indices]
 
-    # Filtra gli indici per escludere i film già visti
-    recommended_indices = [idx for idx in recommended_indices if idx not in watched_movie_indices]
+    # Filtra le predizioni mantenendo solo i film non visti
+    filtered_ratings = predicted_ratings[valid_indices]
+
+    # Ordina gli indici filtrati in base ai voti previsti in ordine decrescente
+    sorted_indices = np.argsort(filtered_ratings)[::-1]
+
+    # Recupera gli indici originali dei film consigliati
+    recommended_indices = [valid_indices[idx] for idx in sorted_indices]
 
     # Seleziona i primi top_n film raccomandati
     recommended_movies = dataframe.iloc[recommended_indices[:top_n]]
 
-    # Ottiene la larghezza attuale del terminale e imposta un valore minimo di 80 caratteri
+    # Ottiene la larghezza attuale del terminale e imposta un valore minimo di 120 caratteri
     terminal_width = shutil.get_terminal_size().columns
     wrap_width = max(120, terminal_width - 20)
 
@@ -303,6 +328,10 @@ def user_testing_sup_train(dataframe, stampe=False):
 
     # Raccolta delle valutazioni dell'utente
     user_ratings = ask_user_ratings(sup_dataframe)
+
+    if user_ratings is None:
+        print("Operazione annullata...")
+        return
 
     # Addestramento del modello supervisionato basato sulle valutazioni dell'utente
     model = train_model(X, user_ratings)
