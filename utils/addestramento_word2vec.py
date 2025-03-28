@@ -229,8 +229,14 @@ def get_similar_movies_with_plot(dataframe, model, keywords, index, topn=10, sta
             labels = dataframe_results['Titolo'].tolist()
             scores = dataframe_results['similarity'].tolist()
 
+            def truncate_labels(labels, max_length=30):
+                return [label if len(label) <= max_length else label[:max_length] + '...' for label in labels]
+
+            # Troncamento delle etichette
+            labels_truncated = truncate_labels(labels)
+
             plt.figure(figsize=(10, 7.5))
-            plt.bar(labels, scores, color=seaborn.color_palette("Purples", len(scores)))
+            plt.bar(labels_truncated, scores, color=seaborn.color_palette("Purples", len(scores)))
             plt.xlabel('Film consigliati', labelpad=-3)
             plt.ylabel('Score di similarità')
             plt.title('Qualità delle Raccomandazioni')
