@@ -436,7 +436,7 @@ def search_movies_by_user_input(dataframe, model, stampe=False):
     """
 
     # Richiediamo all'utente di inserire parole chiave separate da virgole
-    words = input("Inserisci parole chiave separate da una virgola: ").strip().split(',')
+    words = input("Inserisci parole chiave separate da una virgola (in lingua inglese): ").strip().split(',')
     words = [word.strip().lower() for word in words]
 
     print("\n🔄 Lemmatizzazione delle parole chiave in corso...\n")
