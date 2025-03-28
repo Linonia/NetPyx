@@ -389,7 +389,7 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
     print("[OK] Modello Word2Vec addestrato con successo.\n")
 
     # Liste di parole chiave per testare il modello
-    word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
+    word_searching = [["scary", "ghost"], ["challenge", "death"], ["anime", "village"]]
     print(f"[INFO] Liste di parole chiave utilizzate per il test: {word_searching}\n")
 
     # Iteriamo su ogni lista di parole chiave per testare il modello
