@@ -231,7 +231,7 @@ def get_similar_movies_with_plot(dataframe, model, keywords, index, topn=10, sta
 
             plt.figure(figsize=(10, 7.5))
             plt.bar(labels, scores, color=seaborn.color_palette("Purples", len(scores)))
-            plt.xlabel('Film consigliati')
+            plt.xlabel('Film consigliati', labelpad=-3)
             plt.ylabel('Score di similarità')
             plt.title('Qualità delle Raccomandazioni')
             plt.ylim(0, 1)
