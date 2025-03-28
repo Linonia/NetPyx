@@ -383,14 +383,14 @@ def simulate_testing_non_sup_train(dataframe, stampe=False):
 
     print("\n[INFO] Avvio della simulazione di addestramento non supervisionato...\n")
 
-    # Liste di parole chiave per testare il modello
-    word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
-    print(f"[INFO] Liste di parole chiave utilizzate per il test: {word_searching}\n")
-
     # Addestriamo il modello Word2Vec sui dati del dataset
     print("[INFO] Addestramento del modello Word2Vec in corso...\n")
     model = train_word2vec(dataframe)
     print("[OK] Modello Word2Vec addestrato con successo.\n")
+
+    # Liste di parole chiave per testare il modello
+    word_searching = [["scary", "paranormal"], ["challenge", "death"], ["anime", "village"]]
+    print(f"[INFO] Liste di parole chiave utilizzate per il test: {word_searching}\n")
 
     # Iteriamo su ogni lista di parole chiave per testare il modello
     for index, words in enumerate(word_searching):
