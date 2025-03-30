@@ -5,7 +5,7 @@ Repository del progetto di Ingegneria della Conoscenza, A.A. 2023/2024.
 Gruppo di lavoro:
 
 - Michele Grieco (757059, [m.grieco31@studenti.uniba.it](mailto:m.grieco31@studenti.uniba.it))
-- Daniele Gentile (758352, [m.grieco31@studenti.uniba.it](mailto:m.grieco31@studenti.uniba.it))
+- Daniele Gentile (758352, [d.gentile32@studenti.uniba.it](mailto:d.gentile32@studenti.uniba.it))
 
 ## Descrizione del Progetto
 
