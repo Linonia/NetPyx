@@ -25,6 +25,12 @@ Per installare le dipendenze richieste, eseguire:
 pip install -r requirements.txt
 ```
 
+Se non funziona pip, ma è installato, provare come segue:
+```sh
+python -m pip install -r requirements.txt
+```
+
+
 ## Utilizzo
 
 Per avviare il programma principale, eseguire:
