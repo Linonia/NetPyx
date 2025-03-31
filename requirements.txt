@@ -9,7 +9,7 @@ matplotlib>=3.4.0
 seaborn>=0.11.0
 
 # Natural Language Processing
-nltk>=3.6.0
+nltk>=3.9.0
 
 # Word2Vec
 gensim>=4.0.0

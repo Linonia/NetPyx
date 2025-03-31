@@ -10,9 +10,19 @@ from nltk.stem import WordNetLemmatizer
 import matplotlib.pyplot as plt
 import shutil
 import textwrap
+import pkg_resources
 
 # Inizializza NLTK
-nltk.download('punkt', quiet=True)
+
+# Ottieni la versione corrente di NLTK
+nltk_version = pkg_resources.parse_version(nltk.__version__)
+# Se la versione è >= 3.8.2, scarica 'punkt_tab', altrimenti 'punkt'
+if nltk_version >= pkg_resources.parse_version('3.8.2'):
+    nltk.download('punkt_tab', quiet=True)
+else:
+    nltk.download('punkt', quiet=True)
+#nltk.download('punkt', quiet=True)
+#nltk.download('punkt_tab', quiet=True)
 nltk.download('stopwords', quiet=True)
 
 lemmatizer = WordNetLemmatizer()
